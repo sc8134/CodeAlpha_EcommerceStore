@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart — Ecommerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="fw-bold mb-4"><i class="bi bi-cart3 me-2"></i>Your Cart</h2>
+
+  {% if cart|length == 0 %}
+  <div class="text-center py-5">
+    <i class="bi bi-cart-x text-muted" style="font-size:4rem;"></i>
+    <p class="mt-3 fs-5 text-muted">Your cart is empty.</p>
+    <a href="/" class="btn btn-dark px-5 mt-2">Start Shopping</a>
+  </div>
+  {% else %}
+  <div class="row g-4">
+
+    <!-- Cart Items -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <table class="table table-borderless mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Product</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart %}
+              <tr class="border-top">
+                <td class="ps-4">
+                  <div class="d-flex align-items-center gap-3">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                         style="width:60px; height:60px; object-fit:cover;" class="rounded" />
+                    {% else %}
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                         style="width:60px; height:60px;">
+                      <i class="bi bi-image text-secondary"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                      <a href="/product/{{ item.product.slug }}/"
+                         class="fw-semibold text-dark text-decoration-none">{{ item.product.name }}</a>
+                      {% if item.product.category %}
+                      <div class="text-muted small">{{ item.product.category.name }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">${{ item.price }}</td>
+                <td class="text-center" style="width:140px;">
+                  <form method="post" action="/cart/update/{{ item.product.id }}/" class="d-flex justify-content-center">
+                    {% csrf_token %}
+                    <div class="input-group input-group-sm" style="width:110px;">
+                      <button type="button" class="btn btn-outline-secondary qty-btn-cart"
+                              data-input="qty-{{ item.product.id }}" data-action="dec">−</button>
+                      <input type="number" name="quantity" id="qty-{{ item.product.id }}"
+                             value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
+                             class="form-control text-center"
+                             onchange="this.closest('form').submit()" />
+                      <button type="button" class="btn btn-outline-secondary qty-btn-cart"
+                              data-input="qty-{{ item.product.id }}" data-action="inc"
+                              data-max="{{ item.product.stock }}">+</button>
+                    </div>
+                  </form>
+                </td>
+                <td class="text-center fw-semibold text-success">${{ item.total_price }}</td>
+                <td class="pe-4">
+                  <form method="post" action="/cart/remove/{{ item.product.id }}/">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mt-3">
+        <a href="/" class="btn btn-outline-dark">
+          <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+        </a>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Order Summary</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span>${{ cart.get_total_price }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Shipping</span>
+            <span class="text-success">
+              {% if cart.get_total_price >= 50 %}Free{% else %}$5.99{% endif %}
+            </span>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+            <span>Total</span>
+            <span class="text-success">
+              {% if cart.get_total_price >= 50 %}
+                ${{ cart.get_total_price }}
+              {% else %}
+                ${{ cart.get_total_price|floatformat:2 }}
+              {% endif %}
+            </span>
+          </div>
+          <a href="/checkout/" class="btn btn-dark w-100 btn-lg">
+            <i class="bi bi-lock me-2"></i>Proceed to Checkout
+          </a>
+          {% if not user.is_authenticated %}
+          <p class="text-muted small text-center mt-2 mb-0">
+            <a href="/login/?next=/checkout/">Login</a> for a faster checkout experience
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Perks -->
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body small text-muted">
+          <div class="mb-2"><i class="bi bi-shield-check text-success me-2"></i>Secure checkout</div>
+          <div class="mb-2"><i class="bi bi-truck text-primary me-2"></i>Free shipping over $50</div>
+          <div><i class="bi bi-arrow-counterclockwise text-warning me-2"></i>30-day returns</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.qty-btn-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inputId = btn.dataset.input;
+      const input = document.getElementById(inputId);
+      let val = parseInt(input.value) || 1;
+      const max = parseInt(input.max) || 99;
+      if (btn.dataset.action === 'inc') val = Math.min(val + 1, max);
+      if (btn.dataset.action === 'dec') val = Math.max(val - 1, 1);
+      input.value = val;
+      input.closest('form').submit();
+    });
+  });
+</script>
+{% endblock %}

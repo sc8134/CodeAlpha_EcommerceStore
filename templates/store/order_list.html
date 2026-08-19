@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — Ecommerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="fw-bold mb-4"><i class="bi bi-bag-check me-2"></i>My Orders</h2>
+
+  {% if orders %}
+  {% for order in orders %}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <span class="fw-bold me-3">Order #{{ order.id }}</span>
+        <span class="text-muted small">{{ order.created_at|date:"N j, Y" }}</span>
+      </div>
+      <span class="badge
+        {% if order.status == 'delivered' %}bg-success
+        {% elif order.status == 'shipped' %}bg-primary
+        {% elif order.status == 'processing' %}bg-info text-dark
+        {% elif order.status == 'cancelled' %}bg-danger
+        {% else %}bg-warning text-dark{% endif %}
+        fs-6 px-3">
+        {{ order.get_status_display }}
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8">
+          {% for item in order.items.all %}
+          <div class="d-flex align-items-center gap-3 mb-2">
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" style="width:45px;height:45px;object-fit:cover;" class="rounded" alt="{{ item.product.name }}" />
+            {% else %}
+            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:45px;height:45px;">
+              <i class="bi bi-image text-secondary small"></i>
+            </div>
+            {% endif %}
+            <div>
+              <span class="fw-semibold small">{{ item.product.name }}</span>
+              <span class="text-muted small"> × {{ item.quantity }}</span>
+            </div>
+            <span class="ms-auto fw-semibold small">${{ item.get_total_price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <div class="text-muted small mb-1">Order Total</div>
+          <div class="fs-5 fw-bold text-success">${{ order.total_price }}</div>
+          <div class="text-muted small mt-1">{{ order.city }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-bag-x text-muted" style="font-size:4rem;"></i>
+    <p class="mt-3 fs-5 text-muted">No orders yet.</p>
+    <a href="/" class="btn btn-dark px-5">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

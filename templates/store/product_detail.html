@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — Ecommerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      {% if product.category %}
+      <li class="breadcrumb-item"><a href="/category/{{ product.category.slug }}/">{{ product.category.name }}</a></li>
+      {% endif %}
+      <li class="breadcrumb-item active">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <!-- Product Detail -->
+  <div class="row g-5">
+    <!-- Image -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm overflow-hidden rounded-4">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid w-100" alt="{{ product.name }}"
+             style="max-height:500px; object-fit:contain; background:#f8f9fa; padding:1rem;" />
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-light" style="height:400px;">
+          <i class="bi bi-image text-secondary" style="font-size:6rem;"></i>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="col-md-6">
+      {% if product.category %}
+      <span class="badge bg-secondary mb-2">{{ product.category.name }}</span>
+      {% endif %}
+      <h1 class="fw-bold mb-2">{{ product.name }}</h1>
+
+      <div class="mb-3">
+        <span class="fs-2 fw-bold text-success">${{ product.price }}</span>
+      </div>
+
+      <p class="text-muted mb-4">{{ product.description }}</p>
+
+      <!-- Stock -->
+      <div class="mb-4">
+        {% if product.in_stock %}
+        <span class="badge bg-success fs-6 px-3 py-2">
+          <i class="bi bi-check-circle me-1"></i>In Stock ({{ product.stock }} available)
+        </span>
+        {% else %}
+        <span class="badge bg-danger fs-6 px-3 py-2">
+          <i class="bi bi-x-circle me-1"></i>Out of Stock
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Add to Cart -->
+      {% if product.in_stock %}
+      <form method="post" action="/cart/add/{{ product.id }}/" class="add-to-cart-form">
+        {% csrf_token %}
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <label class="fw-semibold mb-0">Quantity:</label>
+          <div class="input-group" style="width:130px;">
+            <button type="button" class="btn btn-outline-secondary qty-btn" data-action="dec">−</button>
+            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}"
+                   class="form-control text-center qty-input" id="qty-input" />
+            <button type="button" class="btn btn-outline-secondary qty-btn" data-action="inc" data-max="{{ product.stock }}">+</button>
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="submit" class="btn btn-dark btn-lg px-5">
+            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+          </button>
+          <a href="/cart/" class="btn btn-outline-dark btn-lg px-4">View Cart</a>
+        </div>
+      </form>
+      {% else %}
+      <button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+      {% endif %}
+
+      <!-- Meta -->
+      <div class="mt-4 pt-3 border-top text-muted small">
+        <i class="bi bi-truck me-1"></i>Free shipping on orders over $50
+        &nbsp;|&nbsp;
+        <i class="bi bi-arrow-counterclockwise me-1"></i>30-day returns
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related %}
+  <div class="mt-5">
+    <h4 class="fw-bold mb-4">You might also like</h4>
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+      {% for p in related %}
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm product-card">
+          <a href="/product/{{ p.slug }}/">
+            {% if p.image %}
+            <img src="{{ p.image.url }}" class="card-img-top product-img" alt="{{ p.name }}" />
+            {% else %}
+            <div class="card-img-top product-img-placeholder d-flex align-items-center justify-content-center bg-light">
+              <i class="bi bi-image text-secondary fs-1"></i>
+            </div>
+            {% endif %}
+          </a>
+          <div class="card-body text-center">
+            <p class="card-title small fw-semibold mb-1">{{ p.name }}</p>
+            <span class="text-success fw-bold">${{ p.price }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Quantity stepper
+  document.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById('qty-input');
+      let val = parseInt(input.value) || 1;
+      const max = parseInt(input.max) || 99;
+      if (btn.dataset.action === 'inc') val = Math.min(val + 1, max);
+      if (btn.dataset.action === 'dec') val = Math.max(val - 1, 1);
+      input.value = val;
+    });
+  });
+</script>
+{% endblock %}

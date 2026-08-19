@@ -1,0 +1,117 @@
+/* main styles for the ecommerce store */
+
+:root {
+  --primary: #1a1a2e;
+  --accent: #ffc107;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f5f6fa;
+  color: #2d2d2d;
+}
+
+/* hero section on homepage */
+.hero-banner {
+  background: linear-gradient(135deg, #1a1a2e, #16213e 50%, #0f3460);
+  min-height: 320px;
+  padding: 4rem 2rem;
+}
+
+.hero-banner h1 {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+/* product cards */
+.product-card {
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.11) !important;
+}
+
+.product-img {
+  height: 220px;
+  object-fit: cover;
+  width: 100%;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.04);
+}
+
+.product-img-placeholder {
+  height: 220px;
+  width: 100%;
+}
+
+/* cart badge pop animation */
+@keyframes pop {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  50%  { transform: translate(-50%, -50%) scale(1.45); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.badge-pop {
+  animation: pop 0.28s ease;
+}
+
+/* form focus ring */
+.form-control:focus {
+  border-color: #1a1a2e;
+  box-shadow: 0 0 0 0.2rem rgba(26, 26, 46, 0.15);
+}
+
+.btn-dark {
+  background-color: #1a1a2e;
+  border-color: #1a1a2e;
+}
+
+.btn-dark:hover {
+  background-color: #0f3460;
+  border-color: #0f3460;
+}
+
+/* order confirmed checkmark */
+.success-icon {
+  animation: bounceIn 0.55s ease;
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.breadcrumb-item a {
+  color: #1a1a2e;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.stretched-link-title:hover {
+  color: #0f3460 !important;
+}
+
+.table > tbody > tr:hover td {
+  background-color: rgba(26, 26, 46, 0.03);
+}
+
+@media (max-width: 576px) {
+  .hero-banner {
+    min-height: 200px;
+    padding: 2rem 1rem;
+  }
+
+  .hero-banner h1 {
+    font-size: 1.75rem;
+  }
+}

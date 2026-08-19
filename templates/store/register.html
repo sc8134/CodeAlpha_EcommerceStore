@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Register — Ecommerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-sm-10 col-md-7 col-lg-5">
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-md-5">
+          <h3 class="fw-bold text-center mb-4"><i class="bi bi-person-plus me-2 text-primary"></i>Create Account</h3>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+              <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+              {% endif %}
+              {% if field.help_text %}
+              <div class="form-text text-muted small">{{ field.help_text }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-dark w-100 btn-lg mb-3">Create Account</button>
+          </form>
+          <hr />
+          <p class="text-center mb-0 text-muted">
+            Already have an account? <a href="/login/" class="fw-semibold text-dark">Login here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

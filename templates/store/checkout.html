@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — Ecommerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="fw-bold mb-4"><i class="bi bi-lock me-2"></i>Checkout</h2>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row g-4">
+
+      <!-- Left: Forms -->
+      <div class="col-lg-8">
+
+        <!-- Shipping Info -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold mb-3"><i class="bi bi-person me-2 text-primary"></i>Shipping Information</h5>
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">First Name *</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">Last Name *</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">Email *</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">Phone *</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Address *</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-8">
+                <label class="form-label fw-semibold">City *</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                <div class="text-danger small">{{ form.city.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-4">
+                <label class="form-label fw-semibold">Postal Code *</label>
+                {{ form.postal_code }}
+                {% if form.postal_code.errors %}
+                <div class="text-danger small">{{ form.postal_code.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold mb-1"><i class="bi bi-credit-card me-2 text-primary"></i>Payment Details</h5>
+            <p class="text-muted small mb-3">Demo only — no real payment is processed.</p>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold">Card Number *</label>
+                {{ form.card_number }}
+                {% if form.card_number.errors %}
+                <div class="text-danger small">{{ form.card_number.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">Expiry (MM/YY) *</label>
+                {{ form.card_expiry }}
+                {% if form.card_expiry.errors %}
+                <div class="text-danger small">{{ form.card_expiry.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label fw-semibold">CVV *</label>
+                {{ form.card_cvv }}
+                {% if form.card_cvv.errors %}
+                <div class="text-danger small">{{ form.card_cvv.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Summary -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm sticky-top" style="top:80px;">
+          <div class="card-body">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            {% for item in cart %}
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="me-2">
+                <span class="fw-semibold small">{{ item.product.name }}</span>
+                <span class="text-muted small"> × {{ item.quantity }}</span>
+              </div>
+              <span class="small fw-semibold text-nowrap">${{ item.total_price }}</span>
+            </div>
+            {% endfor %}
+            <hr />
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Subtotal</span>
+              <span>${{ cart.get_total_price }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Shipping</span>
+              <span class="text-success">
+                {% if cart.get_total_price >= 50 %}Free{% else %}$5.99{% endif %}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+              <span>Total</span>
+              <span class="text-success">${{ cart.get_total_price }}</span>
+            </div>
+            <button type="submit" class="btn btn-dark w-100 btn-lg">
+              <i class="bi bi-bag-check me-2"></i>Place Order
+            </button>
+            <a href="/cart/" class="btn btn-outline-secondary w-100 mt-2">Back to Cart</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Format card number with spaces
+  const cardInput = document.querySelector('input[name="card_number"]');
+  if (cardInput) {
+    cardInput.addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+      e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+    });
+  }
+
+  // Format expiry MM/YY
+  const expiryInput = document.querySelector('input[name="card_expiry"]');
+  if (expiryInput) {
+    expiryInput.addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2);
+      e.target.value = v;
+    });
+  }
+</script>
+{% endblock %}

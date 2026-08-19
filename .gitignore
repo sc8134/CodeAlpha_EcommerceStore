@@ -1,0 +1,44 @@
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django
+*.sqlite3
+staticfiles/
+local_settings.py
+
+# keep media/products images but ignore anything uploaded at runtime
+media/*
+!media/products/
+media/products/*
+!media/products/*.jpg
+!media/products/*.jpeg
+!media/products/*.png
+!media/products/*.webp
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
