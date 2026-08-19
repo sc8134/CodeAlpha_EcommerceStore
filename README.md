@@ -1,5 +1,7 @@
-# Ecommerce Store
+
 An Internship  Task  For Full-stack development provided by CodeAlpha..
+
+# Ecommerce Store
 A basic e-commerce web application built with Django and Bootstrap 5.
 
 ## Features
